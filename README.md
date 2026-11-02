@@ -20,7 +20,8 @@ Course project for ES 225 – AI and Data Science, IIT Bombay (Autumn Semester 2
 | Model | Test MSE | Test R² |
 |---|---|---|
 | Simple linear regression (TDS) | 884.52 | 0.212 |
-| Ridge / Lasso, λ = 1 | – | 0.615 |
+| Ridge regression, λ = 1 | 432.13 | 0.615 |
+| Lasso regression, λ = 1 | 432.14 | 0.615 |
 | Unrestricted Decision Tree | 482.54 | 0.570 |
 | Controlled Decision Tree | 315.64 | 0.719 |
 | Random Forest (100 trees) | 252.59 | 0.775 |
