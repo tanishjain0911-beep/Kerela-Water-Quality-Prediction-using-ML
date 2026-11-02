@@ -388,16 +388,22 @@ const sec5 = [
 ];
 
 // =========================================================== 6 Q5
+// Ridge then Lasso at λ = 0.01, 0.1, 1, 1,000, 10,000; "**0**" marks a coefficient set exactly to zero by Lasso
+const Z0 = "**0**";
 const coefRows = [
-  ["Carbonate (mg/L)", "−0.344", "−0.344", "−0.343", "−0.344", "−0.344", "−0.344"],
-  ["Chloride (mg/L)", "10.304", "10.304", "10.303", "10.304", "10.304", "10.304"],
-  ["Dissolved oxygen (mg/L)", "−0.692", "−0.692", "−0.693", "−0.692", "−0.692", "−0.692"],
-  ["Total dissolved solids (mg/L)", "−1.598", "−1.598", "−1.595", "−1.598", "−1.598", "−1.597"],
-  ["Bicarbonate (mg/L)", "7.501", "7.501", "7.500", "7.501", "7.501", "7.501"],
-  ["Sodium (mg/L)", "11.348", "11.348", "11.346", "11.348", "11.348", "11.348"],
-  ["pH", "4.965", "4.965", "4.965", "4.965", "4.965", "4.965"],
-  ["Sulphate (mg/L)", "3.323", "3.323", "3.324", "3.323", "3.323", "3.323"],
-  ["Total phosphorus (mg P/L)", "−0.250", "−0.250", "−0.249", "−0.250", "−0.250", "−0.249"],
+  ["Carbonate", "−0.344", "−0.344", "−0.343", "0.240", "0.711", "−0.344", "−0.344", "−0.344", Z0, Z0],
+  ["Chloride", "10.304", "10.304", "10.303", "9.009", "4.697", "10.304", "10.304", "10.304", "10.132", "9.245"],
+  ["Dissolved oxygen", "−0.692", "−0.692", "−0.693", "−0.908", "−0.834", "−0.692", "−0.692", "−0.692", "−0.510", Z0],
+  ["TDS", "−1.598", "−1.598", "−1.595", "0.235", "1.888", "−1.598", "−1.598", "−1.597", "−0.766", Z0],
+  ["Bicarbonate", "7.501", "7.501", "7.500", "6.480", "4.014", "7.501", "7.501", "7.501", "6.813", "5.615"],
+  ["Sodium", "11.348", "11.348", "11.346", "9.684", "5.007", "11.348", "11.348", "11.348", "11.456", "11.579"],
+  ["pH", "4.965", "4.965", "4.965", "4.767", "2.854", "4.965", "4.965", "4.965", "4.835", "3.508"],
+  ["Sulphate", "3.323", "3.323", "3.324", "3.483", "2.639", "3.323", "3.323", "3.323", "3.102", "1.821"],
+  ["Total phosphorus", "−0.250", "−0.250", "−0.249", "−0.091", "0.155", "−0.250", "−0.250", "−0.249", Z0, Z0],
+  ...[["Predictors kept", "9", "9", "9", "9", "9", "9", "9", "9", "7", "5"],
+    ["Test MSE", "432.14", "432.14", "432.13", "435.01", "562.17", "432.14", "432.14", "432.14", "432.28", "442.08"],
+    ["Test R^{2}", "0.615", "0.615", "0.615", "0.612", "0.499", "0.615", "0.615", "0.615", "0.615", "0.606"]]
+    .map((r, k) => r.map((t) => ({ text: t, topRule: k === 0 }))),
 ];
 const sec6 = [
   H1("6 Q5. Ridge and Lasso Regression"),
@@ -405,20 +411,22 @@ const sec6 = [
   P("The response is total hardness and the predictors are the nine parameters of Section 1.4, standardised with training statistics (Equation 1); hardness stays in its original units. A coefficient is therefore the predicted change in hardness (mg CaCO_{3}/L) per one training-SD increase in that predictor, conditional on the other predictors. With standardised predictors z_{ij}, the two models minimise:", { keepNext: true }),
   equation(9, [m("Ridge:   "), ...sum([sup([m("("), sub("y", "i"), m(" − "), sub("β", "0"), m(" − "), ...sum([sub("β", "j"), sub("z", "ij")], "j", ""), m(")")], "2")], "i", ""), m(" + λ"), ...sum([subsup("β", "j", "2")], "j", "")]),
   equation(10, [m("Lasso:   "), ...sum([sup([m("("), sub("y", "i"), m(" − "), sub("β", "0"), m(" − "), ...sum([sub("β", "j"), sub("z", "ij")], "j", ""), m(")")], "2")], "i", ""), m(" + λ"), ...sum([m("|"), sub("β", "j"), m("|")], "j", "")]),
-  P("The intercept β_{0} is not penalised. The penalty is added to the sum of squared errors (SSE) rather than to the mean squared error; this convention is stated explicitly because software packages differ in whether they divide the loss by the sample count, which changes the effective scale of λ. Models were fitted for λ = 0.01, 0.1 and 1, as suggested in the brief."),
+  P("The intercept β_{0} is not penalised. The penalty is added to the sum of squared errors (SSE) rather than to the mean squared error; this convention is stated explicitly because software packages differ in whether they divide the loss by the sample count, which changes the effective scale of λ. Models were fitted for λ = 0.01, 0.1 and 1, as suggested in the brief, and additionally for λ = 1,000 and 10,000, where the penalty becomes large enough relative to the SSE for the two methods to behave differently."),
   H2("6.2 Q5(a) Ridge and Q5(b) Lasso coefficients"),
-  tabCaption(10, "Ridge and Lasso coefficients (mg CaCO_{3}/L per training SD of each standardised predictor)."),
-  table(["Predictor", "Ridge λ = 0.01", "Ridge λ = 0.1", "Ridge λ = 1", "Lasso λ = 0.01", "Lasso λ = 0.1", "Lasso λ = 1"], coefRows,
-    [2600, 1070, 1070, 1070, 1070, 1070, 1050], { size: 17 }),
+  tabCaption(10, "Ridge and Lasso coefficients (mg CaCO_{3}/L per training SD of each standardised predictor) and held-out test performance for increasing λ. Bold **0** marks a predictor eliminated by Lasso."),
+  table(["Predictor", "0.01", "0.1", "1", "1,000", "10,000", "0.01", "0.1", "1", "1,000", "10,000"], coefRows,
+    [1800, 720, 720, 720, 720, 740, 720, 720, 720, 720, 740],
+    { size: 15, groupHeader: [{ text: "" }, { text: "Ridge, λ =", span: 5 }, { text: "Lasso, λ =", span: 5 }] }),
+  tableNote("Coefficients at λ ≤ 1 and the test RMSE/R^{2} at λ = 1 are as reported in the member analysis; the coefficients and test metrics at λ = 1,000 and 10,000, and the test MSE values, were computed with the same supplied script on the same training/test split."),
   new Paragraph({ spacing: { after: 60 }, children: [] }),
   ...figure("fig12_q5_coefficients.png", 6.0, 12, "Ridge and Lasso coefficients at λ = 1 for the nine standardised predictors."),
-  P("**How the coefficients change as λ increases.** Over λ = 0.01–1 the coefficients are practically unchanged (Table 10, Figure 12): the largest change is in TDS under Ridge (−1.598 to −1.595), and all others change at most in the third decimal (Table 10). Because the penalty is added to the SSE summed over 4,252 training rows, a penalty of λ ≤ 1 is negligible relative to the loss, so both models remain essentially at the unpenalised least-squares solution. The small Ridge changes that do occur are the expected shrinkage towards zero (for example, chloride 10.304 to 10.303 and sodium 11.348 to 11.346). At λ = 1, Ridge and Lasso both have a test R^{2} of 0.615 and a test RMSE of 20.79 mg CaCO_{3}/L."),
-  P("**Predictors eliminated by Lasso.** At λ = 0.01, 0.1 and 1, Lasso drops no predictors. A supplementary penalty grid shows when sparsity begins: at λ = 10, 100, 1,000 and 10,000, Lasso sets 0, 0, 2 and 4 coefficients to zero respectively. In the supplied analysis script, the two predictors eliminated at λ = 1,000 are carbonate and total phosphorus, and dissolved oxygen and TDS are additionally eliminated at λ = 10,000; the predictors with the largest coefficients (sodium, chloride, bicarbonate, pH and sulphate) are retained. These larger penalties are supplementary; the required comparison remains at the assigned values of λ."),
+  P("**How the coefficients change as λ increases.** Over λ = 0.01–1 the coefficients are practically unchanged (Table 10, Figure 12): the largest change is in TDS under Ridge (−1.598 to −1.595), and all others change at most in the third decimal. Because the penalty is added to the SSE summed over 4,252 training rows, a penalty of λ ≤ 1 is negligible relative to the loss, so both models remain essentially at the unpenalised least-squares solution, with a test R^{2} of 0.615 and a test RMSE of 20.79 mg CaCO_{3}/L at λ = 1. The effect of the penalty becomes visible only when λ is comparable to the number of training rows. Under Ridge, the large coefficients shrink steadily: chloride falls from 10.30 to 9.01 at λ = 1,000 and 4.70 at λ = 10,000, and sodium from 11.35 to 9.68 and 5.01. Because the major ions are correlated, Ridge also spreads weight across them, so the small coefficients of carbonate, TDS and total phosphorus change sign and become slightly positive. The heavier shrinkage costs accuracy: Ridge’s test R^{2} falls to 0.612 at λ = 1,000 and 0.499 at λ = 10,000."),
+  P("**Predictors eliminated by Lasso.** At λ = 0.01, 0.1 and 1, Lasso drops no predictors. At λ = 1,000 it sets carbonate and total phosphorus exactly to zero (7 predictors kept), and at λ = 10,000 it additionally eliminates dissolved oxygen and TDS (5 predictors kept). The predictors with the largest coefficients (sodium, chloride, bicarbonate, pH and sulphate) are retained, and sodium’s coefficient even rises slightly (11.35 to 11.58) as Lasso reallocates weight from the dropped predictors. Despite using only five predictors at λ = 10,000, Lasso keeps a test R^{2} of 0.606, close to the full model’s 0.615."),
   P("**Correlated predictors.** The largest absolute training correlation among the predictors is 0.71, between bicarbonate and sodium. Correlation among predictors can make conditional coefficients unstable or reverse their signs; for example, TDS has a positive slope on its own (Section 5) but a small negative coefficient once the correlated ions are included."),
   H2("6.3 Comparison of Ridge and Lasso"),
-  bullet("**Coefficient shrinkage.** Ridge’s squared (L2) penalty shrinks all coefficients smoothly towards zero but never exactly to zero; Lasso’s absolute (L1) penalty shrinks them and can set some exactly to zero. At the assigned λ values the two give near-identical coefficients and identical test performance (R^{2} = 0.615), because the penalty is small relative to the SSE."),
-  bullet("**Interpretability.** Both models give coefficients on a common standardised scale, so magnitudes are directly comparable: sodium (11.35), chloride (10.30) and bicarbonate (7.50) have the largest effects on predicted hardness. Lasso becomes the more interpretable model once λ is large enough to remove weak predictors."),
-  bullet("**Feature selection.** Ridge performs no feature selection. Lasso performs selection only at much larger penalties in this dataset (λ ≥ 1,000), where it removes the weakest predictors first (carbonate and total phosphorus) and keeps the major ions."),
+  bullet("**Coefficient shrinkage.** Ridge’s squared (L2) penalty shrinks all coefficients smoothly towards zero but never exactly to zero; Lasso’s absolute (L1) penalty shrinks them and can set some exactly to zero. At λ ≤ 1 the two give near-identical coefficients and identical test performance (R^{2} = 0.615), because the penalty is small relative to the SSE. At λ = 10,000 the difference is clear: Ridge has shrunk every coefficient (chloride to 4.70, sodium to 5.01) and its test R^{2} has fallen to 0.499, whereas Lasso has removed four weak predictors and kept the strong ones almost unchanged, with a test R^{2} of 0.606."),
+  bullet("**Interpretability.** Both models give coefficients on a common standardised scale, so magnitudes are directly comparable: sodium (11.35), chloride (10.30) and bicarbonate (7.50) have the largest effects on predicted hardness. Lasso becomes the more interpretable model once λ is large enough to remove weak predictors: at λ = 10,000 it describes hardness with five major-ion and pH terms."),
+  bullet("**Feature selection.** Ridge performs no feature selection. Lasso performs selection only at much larger penalties in this dataset (λ ≥ 1,000), where it removes the weakest predictors first (carbonate and total phosphorus, then dissolved oxygen and TDS) and keeps the major ions. For a sparse model, Lasso at λ = 10,000 is therefore preferable to Ridge at the same penalty."),
 ];
 
 // =========================================================== 7 Q6

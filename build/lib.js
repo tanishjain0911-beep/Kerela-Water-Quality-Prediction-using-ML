@@ -154,7 +154,14 @@ function table(header, rows, widths, opts = {}) {
         children: runs(o.text, { size, bold: isHead || o.bold || undefined }) })],
     });
   };
-  const trows = [new TableRow({ tableHeader: true, cantSplit: true, children: header.map((c, i) => mk(c, i, true, false, true, 0)) })];
+  const trows = [];
+  // optional grouping row above the header, e.g. [{text:""}, {text:"Ridge", span:5}, ...]
+  if (opts.groupHeader) {
+    let col = 0;
+    trows.push(new TableRow({ tableHeader: true, cantSplit: true, children: opts.groupHeader.map((c) => {
+      const cell = mk({ ...c, align: "center" }, col, true, false, true, 0); col += c.span || 1; return cell; }) }));
+  }
+  trows.push(new TableRow({ tableHeader: true, cantSplit: true, children: header.map((c, i) => mk(c, i, true, false, true, 0)) }));
   rows.forEach((r, ri) => {
     const last = ri === rows.length - 1;
     // column index accounting for spans / rowSpan continuation (caller passes `skip` to offset)
