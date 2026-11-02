@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+~$*
+q1_outputs/
+q7_q8_outputs/
+person_c_output/
+node_modules/
