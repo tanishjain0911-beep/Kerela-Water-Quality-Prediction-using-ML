@@ -1,16 +1,15 @@
-# ES 225 – AI and Data Science: Assignment 3 (Group 10)
+# Kerala River Water Quality: Statistical Analysis and Predictive Modelling
 
 Statistical analysis, missing-data handling and predictive modelling of surface water quality in Kerala, using the
 Central Water Commission (CWC) manual chemical water-quality dataset (1980–2020) from the National Water Data Portal.
 
-Environmental Science and Engineering Department, IIT Bombay · Autumn Semester 2026
+Course project for ES 225 – AI and Data Science, IIT Bombay (Autumn Semester 2026).
 
-| Member | Roll No. | Contribution |
-|---|---|---|
-| Tanmay Sandip Dhule | 25B4208 | Q1: statistical analysis of water-quality patterns |
-| Teertha Pankaj Gandhi | 25B4233 | Q2: missing-data analysis; Q3: imputation |
-| Sri Vishnu Vikyath S | 25B4246 | Q4: linear regression; Q5: Ridge and Lasso; Q6: PCA |
-| Tanish Vishal Jain | 25B4244 | Q7: Decision Tree; Q8: Random Forest; verification and cross-checking; report compilation |
+**What the project covers**
+- Descriptive statistics, comparison with BIS/CPCB standards, and seasonal and spatial hypothesis tests (z-tests)
+- Missing-data analysis and comparison of mean, median and mode imputation
+- Simple linear, Ridge and Lasso regression, and principal component analysis
+- Decision Tree (cross-validated complexity control) and Random Forest regression, with a leakage-safe train/test pipeline
 
 ## Report
 - [`output/ES225_Assignment3_Group10_Report.pdf`](output/ES225_Assignment3_Group10_Report.pdf): final report
