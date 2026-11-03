@@ -8,7 +8,7 @@ It also includes a statistical assessment of water quality and a study of how mi
 than simply predicting the mean.
 
 📄 **Full report:** [`output/ES225_Assignment3_Group10_Report.pdf`](output/ES225_Assignment3_Group10_Report.pdf)
-(31 pages; course project for ES 225 – AI and Data Science, IIT Bombay, Autumn 2026)
+(32 pages; course project for ES 225 – AI and Data Science, IIT Bombay, Autumn 2026)
 
 ---
 
@@ -20,8 +20,8 @@ All models predict **total hardness (mg CaCO₃/L)** and are evaluated on the **
 |---|:---:|---:|---:|---:|
 | Baseline (predict the training mean) | – | 1126.67 | 33.57 | – |
 | Simple linear regression | TDS only | 884.52 | 29.74 | 0.212 |
-| Ridge regression (λ = 1) | 9 | 432.13 | 20.79 | 0.615 |
-| Lasso regression (λ = 1) | 9 | 432.14 | 20.79 | 0.615 |
+| Ridge regression (λ = 100, chosen by 5-fold CV) | 9 | 431.76 | 20.78 | 0.615 |
+| Lasso regression (λ ≈ 316, chosen by 5-fold CV) | 9 | 432.07 | 20.79 | 0.615 |
 | Lasso regression (λ = 10,000) | **5** | 442.08 | 21.03 | 0.606 |
 | Decision Tree, unrestricted | 9 | 482.54 | 21.97 | 0.570 |
 | Decision Tree, tuned with 5-fold CV | 9 | 315.64 | 17.77 | 0.719 |
@@ -67,9 +67,11 @@ raw CWC data (5,433 × 52)
 
 - **No data leakage.** Imputation medians and scaling parameters come from the training set only. The test set is never used
   for model selection.
-- **Hyperparameter tuning.** The Decision Tree's settings were chosen by 5-fold cross-validation on the training set, minimising MSE over
-  `max_depth` ∈ {3, 5, 7, 10, 15, None}, `min_samples_leaf` ∈ {1, 2, 5, 10, 20, 30, 50} and `min_samples_split` ∈ {2, 10, 20}.
-  The selected settings were depth 10 and min leaf size 20.
+- **Hyperparameter tuning by 5-fold cross-validation on the training set only.**
+  - Decision Tree: `max_depth` ∈ {3, 5, 7, 10, 15, None}, `min_samples_leaf` ∈ {1, 2, 5, 10, 20, 30, 50} and
+    `min_samples_split` ∈ {2, 10, 20}. The selected settings were depth 10 and min leaf size 20.
+  - Ridge and Lasso: 29 values of λ from 10⁻² to 10⁵, with median imputation and scaling re-fitted inside every fold.
+    The selected penalties were λ = 100 (Ridge) and λ ≈ 316 (Lasso).
 - **Missing data.** In the full dataset TDS is 65% missing, total phosphorus 48% and DO 32% (TDS: 64% of training rows). Mean, median and
   mode imputation were compared (variance retained: 35–77%). Median imputation was chosen because most parameters are right-skewed.
 
@@ -83,6 +85,24 @@ test RMSE 18.62 instead of 29.74.
 <p align="center"><img src="assets/figures/fig10_q4_scatter_fit.png" width="70%" alt="Hardness vs TDS with fitted line"></p>
 
 ### 2. Ridge and Lasso regression (standardised predictors)
+
+**Choosing λ by cross-validation.** λ was selected by 5-fold CV on the training set over 29 values from 10⁻² to 10⁵.
+Imputation and scaling were re-fitted inside every fold, so no validation data leaks into the fit.
+
+| | CV-selected λ | CV MSE | Test MSE | Test R² | Predictors kept |
+|---|---:|---:|---:|---:|---:|
+| **Ridge** | 100 | 627.2 | 431.76 | 0.615 | 9 |
+| **Lasso** | ≈ 316 | 627.2 | 432.07 | 0.615 | 9 |
+| **Lasso, one-standard-error rule** | ≈ 17,800 | 679.5 | 460.29 | 0.590 | 5 |
+
+The CV error is flat for every λ up to about 1,000, so only a light penalty helps. With 9 predictors and 4,252 training rows,
+ordinary least squares already has low variance, and a stronger penalty mainly adds bias. The one-standard-error rule picks the
+largest λ whose CV error is within one standard error of the minimum. It gives a sparser Lasso model (sodium, chloride,
+bicarbonate, pH and sulphate) at a small cost in accuracy.
+
+<p align="center"><img src="assets/figures/fig19_q5_cv_lambda.png" width="62%" alt="5-fold CV error against lambda for Ridge and Lasso"></p>
+
+**Ridge vs Lasso at fixed penalties.**
 
 | | λ = 1 | λ = 1,000 | λ = 10,000 |
 |---|---|---|---|
@@ -157,6 +177,7 @@ analysis_code_and_data/
   train.csv, test.csv        80/20 split of the 5,316 samples with observed hardness
   q1_analysis.py             statistics, standards comparison, hypothesis tests
   person_c_analysis.py       linear regression, Ridge, Lasso, PCA
+  cv_ridge_lasso.py          5-fold cross-validation of the Ridge/Lasso penalty
   es225_q7_q8_analysis.py    Decision Tree (CV-tuned) and Random Forest
 assets/figures/              all figures used in the report
 output/                      final report (PDF and DOCX)
@@ -169,6 +190,7 @@ reference/                   assignment brief
 pip install pandas numpy scipy matplotlib scikit-learn pillow
 python analysis_code_and_data/q1_analysis.py analysis_code_and_data/Original_CWC_dataset.csv q1_outputs
 python analysis_code_and_data/es225_q7_q8_analysis.py analysis_code_and_data/train.csv analysis_code_and_data/test.csv q7_q8_outputs
+python analysis_code_and_data/cv_ridge_lasso.py analysis_code_and_data/train.csv analysis_code_and_data/test.csv cv_ridge_lasso_results.json
 ```
 `person_c_analysis.py` expects `train.csv` and `test.csv` in a `data/` folder next to the script.
 
