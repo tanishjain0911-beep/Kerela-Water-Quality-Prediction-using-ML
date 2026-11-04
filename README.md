@@ -10,6 +10,9 @@ than simply predicting the mean.
 📄 **Full report:** [`output/ES225_Assignment3_Group10_Report.pdf`](output/ES225_Assignment3_Group10_Report.pdf)
 (32 pages; course project for ES 225 – AI and Data Science, IIT Bombay, Autumn 2026)
 
+🎞️ **Presentation:** [`presentation/ES225_Group10_End_Term_Presentation.pptx`](presentation/ES225_Group10_End_Term_Presentation.pptx)
+(end-term presentation slides)
+
 ---
 
 ## Results at a glance
@@ -181,6 +184,7 @@ analysis_code_and_data/
   es225_q7_q8_analysis.py    Decision Tree (CV-tuned) and Random Forest
 assets/figures/              all figures used in the report
 output/                      final report (PDF and DOCX)
+presentation/                end-term presentation (PPTX)
 build/                       scripts that regenerate the report
 reference/                   assignment brief
 ```
